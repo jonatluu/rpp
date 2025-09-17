@@ -2,6 +2,7 @@
 function( configure_debian_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T MAINTAINER_NM_T MAINTAINER_EMAIL_T)
     # Check If Debian Platform
     find_file (DEBIAN debian_version debconf.conf PATHS /etc)
+    message(STATUS "POTATO DEBIAN: ${DEBIAN}")
     if(DEBIAN)
       set( BUILD_DEBIAN_PKGING_FLAG ON CACHE BOOL "Internal Status Flag to indicate Debian Packaging Build" FORCE )
       set_debian_pkg_cmake_flags( ${PACKAGE_NAME_T} ${PACKAGE_VERSION_T}
@@ -30,6 +31,7 @@ function( configure_debian_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T
       )
 
       if( BUILD_ENABLE_LINTIAN_OVERRIDES )
+	message(STATUS "POTATO BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS}")
 	if(NOT BUILD_SHARED_LIBS)
 	  string(FIND ${DEB_OVERRIDES_INSTALL_FILENM} "static" OUT_VAR1)
 	  if(OUT_VAR1 EQUAL -1)
@@ -58,7 +60,7 @@ function( configure_debian_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T
       find_program ( DEB_GZIP_EXEC gzip )
       if(EXISTS "${CMAKE_BINARY_DIR}/DEBIAN/changelog.Debian" )
         execute_process(
-          COMMAND ${DEB_GZIP_EXEC} -n -9 "${CMAKE_BINARY_DIR}/DEBIAN/changelog.Debian"
+          COMMAND ${DEB_GZIP_EXEC} -f -n -9 "${CMAKE_BINARY_DIR}/DEBIAN/changelog.Debian"
           WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/DEBIAN"
           RESULT_VARIABLE result
           OUTPUT_VARIABLE output
@@ -91,7 +93,9 @@ function( set_debian_pkg_cmake_flags DEB_PACKAGE_NAME_T DEB_PACKAGE_VERSION_T DE
     set( DEB_LICENSE                  "MIT" CACHE STRING "Debian Package License Type" )
     set( DEB_CHANGELOG_INSTALL_FILENM "changelog.Debian.gz" CACHE STRING "Debian Package ChangeLog File Name" ) 
 
+    message(STATUS "OUTSIDE BUILD_ENABLE_LINTIAN_OVERRIDES: ${BUILD_ENABLE_LINTIAN_OVERRIDES}")
     if( BUILD_ENABLE_LINTIAN_OVERRIDES )
+      message(STATUS "ENTER BUILD_ENABLE_LINTIAN_OVERRIDES: ${BUILD_ENABLE_LINTIAN_OVERRIDES}")    
       set( DEB_OVERRIDES_INSTALL_FILENM "${DEB_PACKAGE_NAME}" CACHE STRING "Debian Package Lintian Override File Name" )
       set( DEB_OVERRIDES_INSTALL_PATH   "/usr/share/lintian/overrides/" CACHE STRING "Deb Pkg Lintian Override Install Loc" )
     endif()
